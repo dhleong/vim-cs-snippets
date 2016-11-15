@@ -1,0 +1,53 @@
+
+priority 1
+
+global !p
+class Arg(object):
+	def __init__(self, arg):
+		arg = arg.replace("this ", "").replace("params ", "")
+		parts = arg.strip().split(' ')
+		self.type = parts[0].strip()
+		if len(parts) > 1:
+			self.name = parts[1].split('=')[0].strip()
+		else:
+			self.name = ""
+
+	def __str__(self):
+		return self.name
+
+	def __unicode__(self):
+		return self.name
+
+def get_args(arglist):
+	arglist = arglist.strip()
+	if not len(arglist): return None
+	return [Arg(arg) for arg in arglist.split(',') if arg]
+
+def build_summary(snip, arglist):
+	args = get_args(arglist)
+	snip.rv = ""
+	if args:
+		for arg in args:
+			snip += "/// <param name=\"%s\">TODO</param>" % arg.name
+
+endglobal
+
+snippet m "Method" b
+/// <summary>
+/// $5
+/// </summary>`!p build_summary(snip, t[4])`
+${1:public }${2:void} ${3:Name}($4)
+{
+	${VISUAL}$0
+}
+endsnippet
+
+snippet ms "Static Method" b
+/// <summary>
+/// $5
+/// </summary>`!p build_summary(snip, t[4])`
+${1:public }static ${2:void} ${3:Name}($4)
+{
+	${VISUAL}$0
+}
+endsnippet
